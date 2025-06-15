@@ -11,7 +11,8 @@ import NotFound from "./pages/NotFound";
 import Knowledge from "./pages/Knowledge";
 import ShiftSummaryPage from "./pages/ShiftSummary";
 import Analytics from "./pages/Analytics";
-import Settings from "./pages/Settings"; // Add this import
+import Settings from "./pages/Settings";
+import Connectors from "./pages/Connectors";
 
 const queryClient = new QueryClient();
 
@@ -28,10 +29,10 @@ const App = () => (
         <Route path="/profile" element={<Profile />} />
         <Route path="/workspaces" element={<Dashboard />} />
         <Route path="/knowledge" element={<Knowledge />} />
-        <Route path="/connectors" element={<Dashboard />} />
+        <Route path="/connectors" element={<Connectors />} />
         <Route path="/shift-summary" element={<ShiftSummaryPage />} />
-        <Route path="/analytics" element={<Analytics />} /> {/* FIX: now renders Analytics page */}
-        <Route path="/settings" element={<Settings />} /> {/* FIX: was <Dashboard /> */}
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </TooltipProvider>
