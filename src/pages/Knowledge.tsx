@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from "react";
 import Layout from "@/components/layout/Layout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -10,6 +9,7 @@ import RagSidebarSummary from "@/components/knowledge/RagSidebarSummary";
 import RagFineTunePrompts from "@/components/knowledge/RagFineTunePrompts";
 import RagExternalSources from "@/components/knowledge/RagExternalSources";
 import RagAddFileModal from "@/components/knowledge/RagAddFileModal";
+import AnalyticsDashboard from "@/components/knowledge/AnalyticsDashboard";
 
 // Dummy KB file data (20 entries, various extensions/names/indexed state)
 const INITIAL_DUMMY_FILES = [
@@ -125,6 +125,9 @@ const Knowledge = () => {
     <Layout>
       <div className="max-w-7xl mx-auto py-6 px-3 flex flex-col md:flex-row gap-6">
         <main className="flex-1 space-y-8">
+          {/* --- New AnalyticsDashboard at the top --- */}
+          <AnalyticsDashboard />
+          {/* --- Knowledge Base Header & Table --- */}
           <div className="mb-2 flex flex-col gap-1">
             <h1 className="text-3xl font-bold text-white">RAG Knowledge Base <span className="ml-2 px-2 py-0.5 rounded bg-cyber-gunmetal/60 text-xs text-cyber-red font-mono">DEMO DATA</span></h1>
             <p className="max-w-lg text-gray-300">
@@ -231,4 +234,3 @@ const Knowledge = () => {
 };
 
 export default Knowledge;
-
