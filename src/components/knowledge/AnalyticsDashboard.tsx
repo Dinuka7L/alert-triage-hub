@@ -1,9 +1,8 @@
-
 import React, { useState, useMemo } from "react";
 import {
   PieChart, Pie, Cell, Tooltip as ReTooltip, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, CartesianGrid, Legend, ReferenceLine,
 } from "recharts";
-import { File, Discord, Mail, GoogleSheets } from "lucide-react";
+import { File, Users, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Glass style helpers
@@ -49,8 +48,8 @@ const barFileTypeData = [
 
 // Donut chart: Third Party Source
 const donutSourcesData = [
-  { name: "Discord", value: 2, color: neonColors.blue, icon: <Discord className="w-4 h-4" /> },
-  { name: "Google Sheets", value: 1, color: neonColors.green, icon: <GoogleSheets className="w-4 h-4" /> },
+  { name: "Discord", value: 2, color: neonColors.blue, icon: <Users className="w-4 h-4" /> },
+  { name: "Google Sheets", value: 1, color: neonColors.green, icon: <File className="w-4 h-4" /> },
   { name: "Email Ingestion", value: 1, color: neonColors.purple, icon: <Mail className="w-4 h-4" /> },
 ];
 
