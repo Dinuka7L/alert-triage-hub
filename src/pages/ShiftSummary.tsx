@@ -4,13 +4,11 @@ import Layout from '@/components/layout/Layout';
 import ShiftSummaryList from '@/components/shift-summary/ShiftSummaryList';
 import DemoShiftSummaryList from '@/components/shift-summary/DemoShiftSummaryList';
 import TeamFilter from '@/components/shift-summary/TeamFilter';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Plus } from 'lucide-react';
+
+// Removed Button and Sheet for New Summary (right side)
 
 const ShiftSummaryPage = () => {
-  const [open, setOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState("");
 
   return (
@@ -27,32 +25,11 @@ const ShiftSummaryPage = () => {
             </ScrollArea>
           </div>
         </div>
-
-        {/* Right: Real data */}
+        {/* Right: Only Demo list now */}
         <div className="w-full md:w-[68%] flex flex-col min-h-0 flex-1">
-          <div className="flex items-center justify-end mb-2">
-            <Sheet open={open} onOpenChange={setOpen}>
-              <SheetTrigger asChild>
-                <Button 
-                  className="bg-cyber-red text-white hover:bg-cyber-red-dark h-9 px-3 py-1 text-sm"
-                  size="sm"
-                  variant="default"
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  New Summary
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-full max-w-lg">
-                <SheetHeader>
-                  <SheetTitle>Create Shift Summary</SheetTitle>
-                </SheetHeader>
-                <ShiftSummaryList />
-              </SheetContent>
-            </Sheet>
-          </div>
           <div className="relative flex-1 min-h-0">
             <ScrollArea className="h-full min-h-0">
-              <ShiftSummaryList />
+              <DemoShiftSummaryList selectedTeam={selectedTeam} />
             </ScrollArea>
           </div>
         </div>

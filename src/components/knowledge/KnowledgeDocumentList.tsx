@@ -2,10 +2,12 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { Download, Loader2, Search } from "lucide-react";
+import { Download, Loader2, Search, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { KnowledgeAddModal } from "./KnowledgeAddModal";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface KnowledgeDocument {
   id: string;
@@ -29,19 +31,26 @@ const KnowledgeDocumentList: React.FC<{ refreshFlag: boolean, className?: string
   const [documents, setDocuments] = useState<KnowledgeDocument[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [addOpen, setAddOpen] = useState(false);
+
+  // fetchDocuments is reused for refresh animation
+  async function fetchAll(animatedRefresh = false) {
+    if (animatedRefresh) setRefreshing(true);
+    setLoading(!animatedRefresh);
+    const { data, error } = await supabase.from("knowledge_documents").select("*").order("uploaded_at", { ascending: false });
+    if (!error && data) setDocuments(data as KnowledgeDocument[]);
+    const { data: categoryData } = await supabase.from("knowledge_categories").select("*").order("name");
+    if (categoryData) setCategories(categoryData as Category[]);
+    setLoading(false);
+    if (animatedRefresh) setTimeout(() => setRefreshing(false), 800);
+  }
 
   useEffect(() => {
-    async function fetchAll() {
-      setLoading(true);
-      const { data, error } = await supabase.from("knowledge_documents").select("*").order("uploaded_at", { ascending: false });
-      if (!error) setDocuments(data as KnowledgeDocument[]);
-      const { data: categoryData } = await supabase.from("knowledge_categories").select("*").order("name");
-      if (categoryData) setCategories(categoryData as Category[]);
-      setLoading(false);
-    }
-    fetchAll();
+    fetchAll(false);
+    // eslint-disable-next-line
   }, [refreshFlag]);
 
   const filteredDocs = documents.filter(doc => {
@@ -60,6 +69,19 @@ const KnowledgeDocumentList: React.FC<{ refreshFlag: boolean, className?: string
   // Main wrapper must be flex-col and h-full to allow growing
   return (
     <div className={`flex flex-col h-full ${className ?? ""}`}>
+      <div className="flex items-center mb-4">
+        <h2 className="flex items-center text-white text-xl font-bold gap-2 flex-1">
+          Knowledge Documents
+        </h2>
+        <button
+          className="flex items-center gap-1 bg-cyber-red text-white rounded px-3 py-1.5 hover:bg-cyber-red-dark transition ml-2"
+          onClick={() => setAddOpen(true)}
+          aria-label="Add new document"
+        >
+          <Plus className="h-4 w-4" />
+          Add
+        </button>
+      </div>
       <div className="w-full flex flex-col md:flex-row gap-2 mb-4 items-stretch md:items-end">
         <div className="flex-1 flex items-center bg-cyber-gunmetal rounded-md overflow-hidden">
           <Search className="ml-3 text-gray-400" />
@@ -81,8 +103,20 @@ const KnowledgeDocumentList: React.FC<{ refreshFlag: boolean, className?: string
           ))}
         </select>
       </div>
-      {/* The scroll area must grow and take all available space */}
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 relative">
+        {/* Animated refresh spinner overlay */}
+        <AnimatePresence>
+          {refreshing && (
+            <motion.div
+              className="absolute inset-0 bg-black/40 z-20 flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <Loader2 className="animate-spin text-cyber-red w-10 h-10" />
+            </motion.div>
+          )}
+        </AnimatePresence>
         {loading ? (
           <div className="flex items-center justify-center py-16 text-gray-400">
             <Loader2 className="animate-spin mr-2" /> Loading documents...
@@ -113,7 +147,7 @@ const KnowledgeDocumentList: React.FC<{ refreshFlag: boolean, className?: string
                           <Badge key={tag} className="bg-cyber-gunmetal text-gray-300">{tag}</Badge>
                         ))}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">Uploaded: {new Date(doc.uploaded_at).toLocaleString()}</div>
+                      <div className="text-xs text-gray-500 mt-1">Uploaded: {doc.uploaded_at ? new Date(doc.uploaded_at).toLocaleString() : "-"}</div>
                     </div>
                     <div className="flex gap-2 mt-2 sm:mt-0">
                       {doc.file_path &&
@@ -133,6 +167,7 @@ const KnowledgeDocumentList: React.FC<{ refreshFlag: boolean, className?: string
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center px-2 py-1 bg-cyber-gunmetal rounded hover:bg-cyber-gunmetal/80 text-cyber-red transition"
+                          title="External link"
                         >
                           <Download className="h-4 w-4 mr-1" /> Link
                         </a>
@@ -145,6 +180,12 @@ const KnowledgeDocumentList: React.FC<{ refreshFlag: boolean, className?: string
           </ScrollArea>
         )}
       </div>
+      <KnowledgeAddModal
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        categories={categories}
+        onAdded={() => fetchAll(true)}
+      />
     </div>
   );
 };
