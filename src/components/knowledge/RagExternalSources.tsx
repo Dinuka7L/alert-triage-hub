@@ -1,6 +1,6 @@
 
 import React from "react";
-import { discord, googleSheets, envelope } from "lucide-react";
+import { Discord, Envelope, File } from "lucide-react";
 
 const EXTERNALS = [
   {
@@ -8,7 +8,7 @@ const EXTERNALS = [
     name: "Discord",
     url: "https://discord.gg/socgroup",
     display: "SOC Analyst Discord",
-    icon: discord,
+    icon: Discord,
     animate: "animate-pulse"
   },
   {
@@ -16,7 +16,7 @@ const EXTERNALS = [
     name: "Google Sheets",
     url: "https://docs.google.com/spreadsheets/d/1a2b3c4dummy",
     display: "Google Sheets (SOC Logs)",
-    icon: googleSheets,
+    icon: File, // fallback to File icon for Google Sheets
     animate: "animate-bounce"
   },
   {
@@ -24,7 +24,7 @@ const EXTERNALS = [
     name: "Email Ingestion",
     url: "mailto:soc-reports@company.com",
     display: "soc-reports@company.com",
-    icon: envelope,
+    icon: Envelope,
     animate: "animate-pulse"
   }
 ];

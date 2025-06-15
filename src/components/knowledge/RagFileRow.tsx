@@ -1,22 +1,22 @@
 
-import React, { useState } from "react";
-import { circleDot, circleX, file, folder } from "lucide-react";
+import React from "react";
+import { File, Folder } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
-// SVG icons by type (fallback to file)
+// SVG icons by type (fallback to File)
 const ICONS: Record<string, React.ReactNode> = {
-  pdf: <file className="text-cyber-red" />,
-  docx: <file className="text-cyber-red/80" />,
-  xlsx: <folder className="text-green-600" />,
-  txt: <file className="text-gray-400" />,
-  csv: <folder className="text-blue-400" />,
-  pptx: <folder className="text-yellow-400" />,
-  md: <file className="text-white" />,
-  json: <file className="text-cyber-red/60" />,
-  ragdata: <file className="text-cyber-red/80" />,
-  zip: <folder className="text-gray-400" />
+  pdf: <File className="text-cyber-red" />,
+  docx: <File className="text-cyber-red/80" />,
+  xlsx: <Folder className="text-green-600" />,
+  txt: <File className="text-gray-400" />,
+  csv: <Folder className="text-blue-400" />,
+  pptx: <Folder className="text-yellow-400" />,
+  md: <File className="text-white" />,
+  json: <File className="text-cyber-red/60" />,
+  ragdata: <File className="text-cyber-red/80" />,
+  zip: <Folder className="text-gray-400" />
 };
 
 interface RagFileRowProps {
@@ -47,7 +47,7 @@ const RagFileRow: React.FC<RagFileRowProps> = ({
       <td className="px-4 py-2 flex items-center gap-3 font-medium">
         <span className="flex items-center">
           <span className="mr-2">
-            {ICONS[file.type] || <file className="text-gray-300" />}
+            {ICONS[file.type] || <File className="text-gray-300" />}
           </span>
           <span>{file.name}</span>
         </span>
