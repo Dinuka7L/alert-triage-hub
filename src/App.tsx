@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +10,7 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Knowledge from "./pages/Knowledge";
 import ShiftSummaryPage from "./pages/ShiftSummary";
+import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings"; // Add this import
 
 const queryClient = new QueryClient();
@@ -30,7 +30,7 @@ const App = () => (
         <Route path="/knowledge" element={<Knowledge />} />
         <Route path="/connectors" element={<Dashboard />} />
         <Route path="/shift-summary" element={<ShiftSummaryPage />} />
-        <Route path="/analytics" element={<Dashboard />} />
+        <Route path="/analytics" element={<Analytics />} /> {/* FIX: now renders Analytics page */}
         <Route path="/settings" element={<Settings />} /> {/* FIX: was <Dashboard /> */}
         <Route path="*" element={<NotFound />} />
       </Routes>
