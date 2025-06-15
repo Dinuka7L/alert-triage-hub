@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   PieChart, Pie, Cell, Tooltip as ReTooltip, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, CartesianGrid, Legend, ReferenceLine,
@@ -7,9 +8,11 @@ import { Button } from "@/components/ui/button";
 
 // Glass style helpers
 const glass = "bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl";
-const shadowGlow = "shadow-[0_0_40px_0_rgba(42,196,255,0.20)]";
+// CHANGED: Red glow shadow
+const shadowGlow = "shadow-[0_0_40px_0_rgba(198,40,40,0.28)]";
 const kpiGlass = "bg-white/10 border border-white/15 rounded-xl shadow-lg px-6 py-4 flex flex-col items-center min-w-[120px]";
 
+// Neon color palette (kept blue/purple/green for data, but glows are now red)
 const neonColors = {
   blue: "#2AC4FF",
   purple: "#B369F7",
@@ -18,8 +21,8 @@ const neonColors = {
   yellow: "#FFEB3B",
 };
 
-const chartBg = "bg-gradient-to-br from-cyber-gunmetal/60 to-cyber-darker/80";
-const chartBox = `${glass} ${shadowGlow} p-4 pb-2 transition hover:ring-4 hover:ring-cyan-400 hover:bg-white/20 duration-150`;
+// CHANGED: chart box with red tint and hover ring red
+const chartBox = `${glass} ${shadowGlow} p-4 pb-2 transition hover:ring-4 hover:ring-red-500 hover:bg-white/15 duration-150`;
 
 // Dummy KPI data
 const KPIS = [
@@ -78,7 +81,6 @@ function makeHeatData() {
   const grid = [];
   for (let d = 0; d < 7; d++) {
     for (let h = 0; h < 24; h++) {
-      // More hits on Tue at 14:00 and 16:00, less on Sun 5:00
       let activity = Math.floor(Math.random() * 6);
       if (d === 2 && (h === 14 || h === 16)) activity = 12 + Math.floor(Math.random() * 4);
       if (d === 0 && h === 5) activity = 0;
@@ -90,12 +92,12 @@ function makeHeatData() {
 
 const heatData = makeHeatData();
 
-// Utility for color gradient (blue to red)
+// Utility for color gradient (blue to red) — just a subtle tweak to let high values go aggressively red
 function getHeatColor(val: number) {
-  // 0 = blue, 12+ = red
-  const r = Math.min(255, Math.round(32 + (val / 13) * (255 - 32)));
-  const g = Math.round(72 + (val / 13) * (120 - 72));
-  const b = Math.round(255 - (val / 13) * (255 - 64));
+  // 0 = pale, 13+ = punchy red
+  const r = Math.min(255, Math.round(198 + (val / 13) * (255 - 198)));
+  const g = Math.round(40 - (val / 13) * 40);
+  const b = Math.round(40 - (val / 13) * 40);
   return `rgb(${r},${g},${b})`;
 }
 
@@ -108,27 +110,25 @@ const useAutoRefresh = (cb: () => void, delay: number) => {
 };
 
 const AnalyticsDashboard: React.FC = () => {
-  // Theme toggle (simple local/dummy, integrates with page if desired)
   const [theme, setTheme] = useState<"dark" | "light">("dark");
-  // Simulated refresh (toggles a flag, triggers animations)
   const [dataKey, setDataKey] = useState(0);
   useAutoRefresh(() => setDataKey(k => k + 1), 7000);
 
-  // Glass background with neon edge based on theme
+  // CHANGED: red accent border for the dashboard
   const dashBg = theme === "dark"
-    ? `${glass} ${shadowGlow} border border-cyan-400/50 bg-gradient-to-br from-cyber-darker/80 to-cyber-gunmetal/60`
-    : `${glass} border border-blue-300/40 bg-gradient-to-br from-blue-100/80 to-white/60 shadow-[0_0_32px_0_rgba(76,110,255,0.17)]`;
+    ? `${glass} ${shadowGlow} border border-red-500/50 bg-gradient-to-br from-cyber-darker/80 to-cyber-gunmetal/60`
+    : `${glass} border border-red-300/40 bg-gradient-to-br from-red-100/80 to-white/60 shadow-[0_0_32px_0_rgba(198,40,40,0.18)]`;
 
-  // Optionally, charts/labels swap text color in light theme
-  const textBase = theme === "dark" ? "text-white" : "text-blue-950";
+  // CHANGED: use red for text accents
+  const textBase = theme === "dark" ? "text-white" : "text-red-950";
   
-  // KPI bar at the top
+  // KPI bar at the top (glow and hover ring now red)
   const KpiBar = () => (
     <div className="flex flex-wrap gap-4 justify-between w-full mb-6">
       {KPIS.map((k, i) => (
         <div
           key={i}
-          className={`${kpiGlass} ${shadowGlow} hover:ring-2 hover:ring-cyan-400 transition ${theme === "dark" ? "text-white" : "text-blue-900"} relative`}
+          className={`${kpiGlass} ${shadowGlow} hover:ring-2 hover:ring-red-500 transition ${theme === "dark" ? "text-white" : "text-red-900"} relative`}
         >
           <div className="text-xs font-semibold opacity-65 mb-1">{k.label}</div>
           <div className="text-2xl font-bold font-mono">{k.value}</div>
@@ -137,10 +137,10 @@ const AnalyticsDashboard: React.FC = () => {
     </div>
   );
 
-  // Pie Chart panel
+  // Pie Chart panel (change title and tooltip accents to red)
   const PiePanel = () => (
     <div className={chartBox}>
-      <div className="font-bold mb-2 text-cyan-400">RAG Indexing Overview</div>
+      <div className="font-bold mb-2 text-red-400">RAG Indexing Overview</div>
       <ResponsiveContainer width="100%" height={170}>
         <PieChart>
           <Pie
@@ -162,14 +162,14 @@ const AnalyticsDashboard: React.FC = () => {
           </Pie>
           <ReTooltip
             contentStyle={{
-              background: "rgba(30, 30, 38, 0.95)",
+              background: "rgba(38,20,20,0.95)",
               borderRadius: 12,
               color: "#fff",
-              border: "1px solid #85e0ff",
+              border: "1px solid #ff1744",
               fontFamily: "inherit",
               fontWeight: 600,
               fontSize: 14,
-              boxShadow: "0 3px 14px #18014a67",
+              boxShadow: "0 3px 14px #910B1467",
             }}
             formatter={(value, name) => [
               `${value} files`,
@@ -192,7 +192,7 @@ const AnalyticsDashboard: React.FC = () => {
     </div>
   );
 
-  // File Type Breakdown: Bar chart
+  // File Type Breakdown: Bar chart (title/tooltip purple + red border hover)
   const BarPanel = () => (
     <div className={chartBox}>
       <div className="font-bold mb-2 text-purple-300">File Types Breakdown</div>
@@ -200,22 +200,22 @@ const AnalyticsDashboard: React.FC = () => {
         <BarChart
           data={barFileTypeData}
           barSize={24}
-          key={dataKey} // Re-mount for animation on refresh
+          key={dataKey}
         >
-          <XAxis dataKey="type" stroke="#D2BBFF" tick={{ fontSize: 13 }} axisLine={false} tickLine={false} />
-          <YAxis stroke="#D2BBFF" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
+          <XAxis dataKey="type" stroke="#FFD2D2" tick={{ fontSize: 13 }} axisLine={false} tickLine={false} />
+          <YAxis stroke="#FFD2D2" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
           <Bar dataKey="count" radius={[8, 8, 2, 2]} isAnimationActive>
             {barFileTypeData.map((entry, i) => (
               <Cell key={i} fill={neonColors.purple} className="cursor-pointer" />
             ))}
           </Bar>
           <ReTooltip
-            cursor={{ fill: "rgba(179,105,247,0.15)" }}
+            cursor={{ fill: "rgba(198,40,40,0.15)" }}
             contentStyle={{
-              background: "#271841",
+              background: "#271818",
               borderRadius: 10,
               color: "#fff",
-              border: "1px solid #da85ff",
+              border: "1px solid #ff1744",
             }}
             formatter={value => [`${value} files`, "Count"]}
             labelFormatter={label => label}
@@ -225,10 +225,10 @@ const AnalyticsDashboard: React.FC = () => {
     </div>
   );
 
-  // Donut: Third Party Sources
+  // Donut: Third Party Sources (title/tooltip red accent)
   const DonutPanel = () => (
     <div className={chartBox}>
-      <div className="font-bold mb-2 text-blue-300">Third-Party Source Usage</div>
+      <div className="font-bold mb-2 text-red-300">Third-Party Source Usage</div>
       <ResponsiveContainer width="100%" height={170}>
         <PieChart>
           <Pie
@@ -248,10 +248,10 @@ const AnalyticsDashboard: React.FC = () => {
           </Pie>
           <ReTooltip
             contentStyle={{
-              background: "#181F39",
+              background: "#391818",
               borderRadius: 13,
               color: "#fff",
-              border: "1px solid #57faf7",
+              border: "1px solid #ff1744",
             }}
             formatter={(_, index, payload) => {
               const d = payload && payload[index] ? payload[index].payload : null;
@@ -272,7 +272,7 @@ const AnalyticsDashboard: React.FC = () => {
     </div>
   );
 
-  // Line panel: KB Growth
+  // Line panel: KB Growth (title/tooltip green, but grid/cursor accents subtle red)
   const LinePanel = () => (
     <div className={chartBox}>
       <div className="font-bold mb-2 text-green-400">KB Growth Over 7 Days</div>
@@ -281,9 +281,9 @@ const AnalyticsDashboard: React.FC = () => {
           data={lineGrowthData}
           margin={{ top: 10, right: 12, left: 8, bottom: 8 }}
         >
-          <CartesianGrid strokeDasharray="4" stroke="#355" />
-          <XAxis dataKey="day" stroke="#8fffe7" tick={{ fontSize: 13 }} axisLine={false} tickLine={false} />
-          <YAxis stroke="#32ffb6" tick={{ fontSize: 13 }} axisLine={false} tickLine={false} allowDecimals={false} />
+          <CartesianGrid strokeDasharray="4" stroke="#5f2323" />
+          <XAxis dataKey="day" stroke="#ffbebe" tick={{ fontSize: 13 }} axisLine={false} tickLine={false} />
+          <YAxis stroke="#ffccc4" tick={{ fontSize: 13 }} axisLine={false} tickLine={false} allowDecimals={false} />
           <Line
             type="monotone"
             dataKey="files"
@@ -296,10 +296,10 @@ const AnalyticsDashboard: React.FC = () => {
           />
           <ReTooltip
             contentStyle={{
-              background: "#091A16",
+              background: "#391818",
               borderRadius: 11,
               color: "#fff",
-              border: "1px solid #30ECA6",
+              border: "1px solid #ff1744",
             }}
             formatter={(v) => [`${v} files`]}
             labelFormatter={l => `${l}`}
@@ -309,10 +309,10 @@ const AnalyticsDashboard: React.FC = () => {
     </div>
   );
 
-  // Query Success/Fail panel: horizontal bars
+  // Query Success/Fail panel: horizontal bars (title red)
   const HBarPanel = () => (
     <div className={chartBox}>
-      <div className="font-bold mb-3 text-green-300">Query Success vs Failure</div>
+      <div className="font-bold mb-3 text-red-300">Query Success vs Failure</div>
       <div className="flex flex-col gap-2 px-2 pt-2 pb-0">
         {queryResultData.map((d, i) => (
           <div
@@ -340,12 +340,11 @@ const AnalyticsDashboard: React.FC = () => {
     </div>
   );
 
-  // Heat Map panel
+  // Heat Map panel (grid red glow + title text now red)
   const HeatPanel = () => (
     <div className={chartBox + " min-h-[240px]"}>
-      <div className="font-bold mb-2 text-blue-400">Recent Activity Heatmap</div>
+      <div className="font-bold mb-2 text-red-400">Recent Activity Heatmap</div>
       <div className="w-full flex items-center justify-center p-2">
-        {/* Wrapping grid in a square flexbox */}
         <div
           className="relative"
           style={{
@@ -414,8 +413,8 @@ const AnalyticsDashboard: React.FC = () => {
                       height: 16,
                       margin: 0,
                       background: getHeatColor(dat?.value ?? 0),
-                      border: dat?.value > 10 ? "1.5px solid #ff0033" : "1px solid rgba(160,160,255,0.14)",
-                      filter: dat?.value > 10 ? "drop-shadow(0 0 7px #fd003a99)" : undefined,
+                      border: dat?.value > 10 ? "1.5px solid #ff1744" : "1px solid rgba(198,40,40,0.13)",
+                      filter: dat?.value > 10 ? "drop-shadow(0 0 7px #ff174499)" : undefined,
                     }}
                   />
                 );
@@ -427,18 +426,17 @@ const AnalyticsDashboard: React.FC = () => {
     </div>
   );
 
-  // Download (dummy) button
+  // Download (dummy) button (shadow/ring/red accents)
   function handleDownload() {
-    // Simulate download - flash; add logic as desired.
     alert("Downloading analytics report (dummy)!");
   }
 
-  // Theme toggle (optional)
+  // Theme toggle (ring/border/text now red accent)
   const ThemeToggle = () => (
     <button
       className="absolute top-5 right-7 z-10 text-xs rounded-lg px-4 py-1.5 font-bold transition 
-        bg-white/10 border border-cyan-400/70 shadow 
-        hover:bg-cyan-500/30 text-cyan-300 hover:text-white
+        bg-white/10 border border-red-400/70 shadow 
+        hover:bg-red-500/30 text-red-300 hover:text-white
         backdrop-blur"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       aria-label="Toggle light/dark mode"
@@ -453,13 +451,13 @@ const AnalyticsDashboard: React.FC = () => {
       <div className="mx-auto max-w-7xl">
         <div className="mb-1 flex flex-col sm:flex-row gap-2 sm:items-center justify-between">
           <h2 className={`text-3xl font-black tracking-tight mb-3 drop-shadow glow text-glow ${
-            theme === "dark" ? "text-white" : "text-blue-900"
+            theme === "dark" ? "text-white" : "text-red-900"
           }`}>📊 Knowledge Base Analytics</h2>
           <Button
-            className="bg-cyan-400/70 backdrop-blur-md border border-cyan-300 text-white font-bold px-7 py-2 rounded-xl hover:bg-cyan-500/90 transition shadow-lg active:scale-95 hover:shadow-[0_0_24px_0_rgba(12,241,249,0.70)] focus:ring-2 focus:ring-cyan-300 focus:outline-none"
+            className="bg-red-500/80 backdrop-blur-md border border-red-400 text-white font-bold px-7 py-2 rounded-xl hover:bg-red-600/90 transition shadow-lg active:scale-95 hover:shadow-[0_0_24px_0_rgba(255,23,68,0.70)] focus:ring-2 focus:ring-red-300 focus:outline-none"
             style={{
-              boxShadow: `0 0 0 2px #ffffff22, 0 4px 24px 0 #1cfafd66`,
-              textShadow: "0 0 6px #60eaff",
+              boxShadow: `0 0 0 2px #ff174422, 0 4px 24px 0 #ff174466`,
+              textShadow: "0 0 6px #ff1744",
             }}
             onClick={handleDownload}
           >
@@ -468,11 +466,9 @@ const AnalyticsDashboard: React.FC = () => {
         </div>
         <KpiBar />
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {/* Row 1 */}
           <PiePanel />
           <BarPanel />
           <DonutPanel />
-          {/* Row 2 */}
           <LinePanel />
           <HBarPanel />
           <HeatPanel />
