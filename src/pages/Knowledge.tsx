@@ -4,14 +4,15 @@ import Layout from "@/components/layout/Layout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Search, File } from "lucide-react";
+import { Search, File, Upload } from "lucide-react";
 import RagFileTable from "@/components/knowledge/RagFileTable";
 import RagSidebarSummary from "@/components/knowledge/RagSidebarSummary";
 import RagFineTunePrompts from "@/components/knowledge/RagFineTunePrompts";
 import RagExternalSources from "@/components/knowledge/RagExternalSources";
+import RagAddFileModal from "@/components/knowledge/RagAddFileModal";
 
 // Dummy KB file data (20 entries, various extensions/names/indexed state)
-const DUMMY_FILES = [
+const INITIAL_DUMMY_FILES = [
   { id: 1, name: "Customer_Policies_v2.pdf", type: "pdf", indexed: true },
   { id: 2, name: "Incident_Report_2023_Q4.docx", type: "docx", indexed: false },
   { id: 3, name: "Threat_Indicators_List.csv", type: "csv", indexed: true },
@@ -39,28 +40,49 @@ const FILE_TYPE_OPTIONS = [
   "pdf", "docx", "xlsx", "txt", "csv", "pptx", "md", "json", "ragdata", "zip"
 ];
 
+// Dummy ML Model info
+const DUMMY_ML_MODEL = {
+  name: "OpenAI GPT-4o",
+  icon: <File className="inline-block h-4 w-4 text-blue-400 mr-1" />, // Use the allowed icon
+};
+
 const Knowledge = () => {
+  // File state
+  const [dummyFiles, setDummyFiles] = useState(INITIAL_DUMMY_FILES);
+
   // Filtering/search state
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterIndexed, setFilterIndexed] = useState(false);
   const [show3rdParty, setShow3rdParty] = useState(false);
 
+  // Add file modal state
+  const [addOpen, setAddOpen] = useState(false);
+
   // File "toggle" (enabled/disabled for RAG) state
   const [enabledFiles, setEnabledFiles] = useState<Record<number, boolean>>(() =>
-    DUMMY_FILES.reduce((acc, file) => {
+    INITIAL_DUMMY_FILES.reduce((acc, file) => {
       acc[file.id] = true;
       return acc;
     }, {} as Record<number, boolean>)
   );
   // "Index Now" simulated state: mark as indexed after action
   const [fileIndexed, setFileIndexed] = useState<Record<number, boolean>>(
-    () => Object.fromEntries(DUMMY_FILES.map(f => [f.id, f.indexed]))
+    () => Object.fromEntries(INITIAL_DUMMY_FILES.map(f => [f.id, f.indexed]))
   );
+
+  // Handle new file (dummy data)
+  const handleAddDummyFile = (file: { name: string; type: string; indexed: boolean; }) => {
+    const newId = dummyFiles.length ? Math.max(...dummyFiles.map(f => f.id)) + 1 : 1;
+    const nf = { ...file, id: newId };
+    setDummyFiles(prev => [nf, ...prev]);
+    setEnabledFiles(prev => ({ ...prev, [newId]: true }));
+    setFileIndexed(prev => ({ ...prev, [newId]: nf.indexed }));
+  };
 
   // Compute filtered file list
   const filteredFiles = useMemo(() => {
-    let files = DUMMY_FILES.map(f => ({ ...f, indexed: fileIndexed[f.id] }));
+    let files = dummyFiles.map(f => ({ ...f, indexed: fileIndexed[f.id] }));
     if (search.trim()) {
       files = files.filter(f => f.name.toLowerCase().includes(search.toLowerCase()));
     }
@@ -77,16 +99,17 @@ const Knowledge = () => {
       );
     }
     return files;
-  }, [search, filterType, filterIndexed, show3rdParty, fileIndexed]);
+  }, [search, filterType, filterIndexed, show3rdParty, fileIndexed, dummyFiles]);
 
   // Sidebar summary statistics
   const summaryStats = useMemo(() => {
-    const total = DUMMY_FILES.length;
+    const total = dummyFiles.length;
     const indexed = Object.values(fileIndexed).filter(Boolean).length;
     const unindexed = total - indexed;
-    const thirdParty = DUMMY_FILES.filter(f => ["ragdata", "csv", "json", "xlsx"].includes(f.type)).length;
-    return { total, indexed, unindexed, thirdParty };
-  }, [fileIndexed]);
+    const thirdParty = dummyFiles.filter(f => ["ragdata", "csv", "json", "xlsx"].includes(f.type)).length;
+    // Add model info!
+    return { total, indexed, unindexed, thirdParty, model: DUMMY_ML_MODEL };
+  }, [fileIndexed, dummyFiles]);
 
   // Action handlers
   const handleIndexFile = (id: number) => {
@@ -109,11 +132,22 @@ const Knowledge = () => {
             </p>
           </div>
           <Card className="bg-cyber-darker border-cyber-gunmetal">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-white">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between">
+              <div className="flex items-center gap-2">
                 <File className="h-5 w-5 text-cyber-red" />
-                Files in Knowledge Base
-              </CardTitle>
+                <CardTitle className="flex items-center gap-2 text-white">
+                  Files in Knowledge Base
+                </CardTitle>
+              </div>
+              {/* Add File button */}
+              <button
+                className="flex items-center gap-1 bg-cyber-red text-white rounded px-3 py-1.5 hover:bg-cyber-red-dark transition ml-2"
+                onClick={() => setAddOpen(true)}
+                aria-label="Add new dummy file"
+              >
+                <Upload className="h-4 w-4" />
+                Add File
+              </button>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col md:flex-row gap-2 mb-2 items-stretch md:items-end">
@@ -190,8 +224,11 @@ const Knowledge = () => {
           <RagSidebarSummary {...summaryStats} />
         </aside>
       </div>
+      {/* Dummy File Add Modal */}
+      <RagAddFileModal open={addOpen} onClose={() => setAddOpen(false)} onAddFile={handleAddDummyFile} />
     </Layout>
   );
 };
 
 export default Knowledge;
+

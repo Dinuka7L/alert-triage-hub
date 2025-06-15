@@ -7,13 +7,15 @@ interface RagSidebarSummaryProps {
   indexed: number;
   unindexed: number;
   thirdParty: number;
+  model?: { name: string; icon: React.ReactNode }; // model is now optional prop
 }
 
 export default function RagSidebarSummary({
   total,
   indexed,
   unindexed,
-  thirdParty
+  thirdParty,
+  model,
 }: RagSidebarSummaryProps) {
   return (
     <div className="rounded-lg bg-cyber-dark border border-cyber-gunmetal py-4 px-6 shadow-lg sticky top-4 w-full">
@@ -27,6 +29,11 @@ export default function RagSidebarSummary({
         <StatRow label="Unindexed" value={unindexed} icon={
           <span className="inline-block h-3 w-3 rounded-full bg-red-500 animate-[ping_1.2s_linear_infinite] mr-2" />} />
         <StatRow label="3rd Party Sources" value={thirdParty} icon={<Folder className="h-4 w-4 text-blue-400" />} />
+        {model && (
+          <div className="flex items-center gap-2 mt-2 pl-1 text-[15px] text-cyber-red">
+            {model.icon}<span className="whitespace-nowrap">ML Model: <span className="font-semibold text-white">{model.name}</span></span>
+          </div>
+        )}
       </div>
       <div className="mt-5 text-xs text-gray-400">Stats reflect demo/mock file data</div>
     </div>
@@ -42,3 +49,4 @@ function StatRow({ label, value, icon }: { label: string, value: number, icon: R
     </div>
   );
 }
+
