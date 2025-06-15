@@ -204,43 +204,77 @@ const Chat = () => {
 
   const [isComposing, setIsComposing] = useState(false);
 
-  const handleSendMessage = (content: string) => {
-    // Add user message immediately
-    const newMsg: ChatMessage = {
-      id: `${activeChat.messages.length + 1}`,
+  // New chat creation
+  const handleNewChat = () => {
+    const now = new Date();
+    const newSession: ChatSession = {
+      id: `new-${Date.now()}`,
+      title: 'New AI Session',
+      messages: [],
+      workspaceId: 'ws-demo',
+      createdAt: now,
+      updatedAt: now,
+    };
+    setSessions(prev => [newSession, ...prev]);
+    setActiveChatId(newSession.id);
+  };
+
+  // Updated send message to support fallback if session not found
+  const handleSendMessage = (content: string, vtResult?: string) => {
+    // vtResult for VirusTotal result so we can inject it just after user message
+    const idx = sessions.findIndex(s => s.id === activeChatId);
+    const targetChat = sessions[idx];
+    if (!targetChat) return;
+
+    const now = new Date();
+    const userMsg: ChatMessage = {
+      id: `${targetChat.messages.length + 1}`,
       content,
-      role: 'user',
-      timestamp: new Date(),
+      role: "user",
+      timestamp: now,
     };
-    const updatedChat: ChatSession = {
-      ...activeChat,
-      messages: [...activeChat.messages, newMsg],
-      updatedAt: new Date(),
-    };
-    setSessions((prev) =>
-      prev.map((chat, i) => (i === activeChatIdx ? updatedChat : chat))
-    );
-    // 1. Show AI composing...
-    setIsComposing(true);
-    // 2. After 1.4s, add dummy AI response and hide composing
-    setTimeout(() => {
-      // Pick a random dummy AI message
-      const aiMsg: ChatMessage = {
-        id: `${updatedChat.messages.length + 1}`,
-        content: dummyAIResponses[Math.floor(Math.random() * dummyAIResponses.length)],
-        role: 'assistant',
+    let msgs = [...targetChat.messages, userMsg];
+
+    if (vtResult) {
+      const vtMsg: ChatMessage = {
+        id: `${msgs.length + 1}`,
+        content: vtResult,
+        role: "assistant",
         timestamp: new Date(),
       };
-      const nextUpdatedChat: ChatSession = {
-        ...updatedChat,
-        messages: [...updatedChat.messages, aiMsg],
-        updatedAt: new Date(),
-      };
-      setSessions((prev) =>
-        prev.map((chat, i) => (i === activeChatIdx ? nextUpdatedChat : chat))
-      );
-      setIsComposing(false);
-    }, 1400);
+      msgs = [...msgs, vtMsg];
+    }
+
+    const updatedChat: ChatSession = {
+      ...targetChat,
+      messages: msgs,
+      updatedAt: now,
+    };
+    setSessions((prev) =>
+      prev.map((chat, i) => (i === idx ? updatedChat : chat))
+    );
+
+    // Only run dummy AI response if not VirusTotal
+    if (!vtResult) {
+      setIsComposing(true);
+      setTimeout(() => {
+        const aiMsg: ChatMessage = {
+          id: `${updatedChat.messages.length + 1}`,
+          content: dummyAIResponses[Math.floor(Math.random() * dummyAIResponses.length)],
+          role: 'assistant',
+          timestamp: new Date(),
+        };
+        const nextUpdatedChat: ChatSession = {
+          ...updatedChat,
+          messages: [...updatedChat.messages, aiMsg],
+          updatedAt: new Date(),
+        };
+        setSessions((prev) =>
+          prev.map((chat, i) => (i === idx ? nextUpdatedChat : chat))
+        );
+        setIsComposing(false);
+      }, 1400);
+    }
   };
 
   const handleEscalate = () => {
@@ -260,6 +294,16 @@ const Chat = () => {
                   <MessageSquare className="h-5 w-5 mr-2 text-cyber-red" />
                   Ask AI Sessions
                 </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-cyber-red text-cyber-red px-2 py-1"
+                  onClick={handleNewChat}
+                  aria-label="Start new chat"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="sr-only">New chat</span>
+                </Button>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -331,6 +375,7 @@ const Chat = () => {
             onEscalate={handleEscalate}
             isComposing={isComposing}
             className="h-full"
+            enableFileUpload
           />
         </div>
       </div>
