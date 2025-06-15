@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { BadgeCheck, Wrench, AlertTriangle, Gear, RefreshCw, FileText, Users, Mail } from "lucide-react";
+import { BadgeCheck, Wrench, AlertTriangle, gear as Gear, RefreshCw, FileText, Users, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export interface Connector {
@@ -202,3 +202,4 @@ export default function ConnectorCard({
     </div>
   );
 }
+
