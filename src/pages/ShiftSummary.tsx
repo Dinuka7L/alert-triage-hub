@@ -9,16 +9,14 @@ const ShiftSummaryPage = () => {
 
   return (
     <Layout>
-      <div className="flex flex-col md:flex-row gap-4 md:gap-8 h-[calc(100vh-48px)] min-h-0 w-full">
-        {/* Left: Only TeamFilter */}
-        <div className="w-full md:w-[32%] flex flex-col min-h-0 flex-1">
+      <div className="flex flex-col h-[calc(100vh-48px)] min-h-0 w-full">
+        {/* Team filter row at the top */}
+        <div className="flex-shrink-0 mt-2 px-2 md:px-0">
           <TeamFilter selectedTeam={selectedTeam} onSelect={setSelectedTeam} />
         </div>
-        {/* Right: Demo shift summary */}
-        <div className="w-full md:w-[68%] flex flex-col min-h-0 flex-1">
-          <div className="relative flex-1 min-h-0">
-            <DemoShiftSummaryList selectedTeam={selectedTeam} />
-          </div>
+        {/* Demo shift summaries take full space below */}
+        <div className="flex-1 min-h-0 mt-2">
+          <DemoShiftSummaryList selectedTeam={selectedTeam} />
         </div>
       </div>
     </Layout>
