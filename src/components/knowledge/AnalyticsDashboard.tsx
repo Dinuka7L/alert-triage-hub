@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import {
   PieChart, Pie, Cell, Tooltip as ReTooltip, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, CartesianGrid, Legend, ReferenceLine,
 } from "recharts";
@@ -342,37 +342,87 @@ const AnalyticsDashboard: React.FC = () => {
 
   // Heat Map panel
   const HeatPanel = () => (
-    <div className={chartBox + " min-h-[210px]"}>
+    <div className={chartBox + " min-h-[240px]"}>
       <div className="font-bold mb-2 text-blue-400">Recent Activity Heatmap</div>
-      <div className="overflow-auto px-0 pb-2">
-        <div className="grid grid-cols-25 gap-0.5">
-          <div className="col-span-1" />
-          {hours.map(h =>
-            <div key={"h" + h} className="text-[10px] text-gray-300 p-0.5 text-center">{h % 6 === 0 ? `${h}` : ""}</div>
-          )}
-        </div>
-        {days.map((d, di) => (
-          <div key={d} className="grid grid-cols-25 gap-0.5 items-center">
-            <div className="text-xs w-7 text-right pr-2 text-gray-400">{d}</div>
-            {hours.map(h => {
-              const dat = heatData.find(dd => dd.day === di && dd.hour === h);
-              return (
-                <div
-                  key={d + h}
-                  title={`${d} ${h}:00 — ${dat?.value ?? 0} hits`}
-                  className="rounded cursor-pointer transition-all"
-                  style={{
-                    width: 13,
-                    height: 13,
-                    background: getHeatColor(dat?.value ?? 0),
-                    border: dat?.value > 10 ? "1.5px solid #ff0033" : "1px solid rgba(160,160,255,0.11)",
-                    filter: dat?.value > 10 ? "drop-shadow(0 0 7px #fd003a99)" : undefined,
-                  }}
-                />
-              );
-            })}
+      <div className="w-full flex items-center justify-center p-2">
+        {/* Wrapping grid in a square flexbox */}
+        <div
+          className="relative"
+          style={{
+            width: 220,
+            height: 220,
+            minWidth: 180,
+            minHeight: 180,
+            maxWidth: "100%",
+          }}
+        >
+          {/* Grid labels */}
+          <div
+            className="absolute left-0 top-4 flex flex-col gap-[4px] z-10 select-none"
+            style={{ height: 176 }}
+          >
+            {days.map((d, idx) => (
+              <span
+                key={d}
+                className="text-[11px] text-gray-300 leading-4 h-[22px] flex items-center justify-end pr-[2px]"
+                style={{ height: 22 }}
+              >
+                {d}
+              </span>
+            ))}
           </div>
-        ))}
+          {/* Hour labels */}
+          <div
+            className="absolute top-0 left-8 flex gap-[4px] z-10 select-none"
+            style={{ width: 176 }}
+          >
+            {hours.map((h) => (
+              <span
+                key={h}
+                className="text-[10px] text-gray-400 w-[7px] text-center"
+                style={{
+                  width: 7,
+                  height: 16,
+                  display: (h % 6 === 0) ? "block" : "none",
+                }}
+              >
+                {h}
+              </span>
+            ))}
+          </div>
+          {/* Main grid */}
+          <div
+            className="absolute left-7 top-4 grid"
+            style={{
+              gridTemplateColumns: "repeat(24, 7px)",
+              gridTemplateRows: "repeat(7, 22px)",
+              gap: 4,
+              width: 176,
+              height: 176,
+            }}
+          >
+            {days.map((d, di) =>
+              hours.map((h, hi) => {
+                const dat = heatData.find(dd => dd.day === di && dd.hour === h);
+                return (
+                  <div
+                    key={`${d}${h}`}
+                    title={`${d} ${h}:00 — ${dat?.value ?? 0} hits`}
+                    className="rounded transition-all cursor-pointer"
+                    style={{
+                      width: 7,
+                      height: 16,
+                      margin: 0,
+                      background: getHeatColor(dat?.value ?? 0),
+                      border: dat?.value > 10 ? "1.5px solid #ff0033" : "1px solid rgba(160,160,255,0.14)",
+                      filter: dat?.value > 10 ? "drop-shadow(0 0 7px #fd003a99)" : undefined,
+                    }}
+                  />
+                );
+              })
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
