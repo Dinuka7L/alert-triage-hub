@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Discord, Envelope, File } from "lucide-react";
+import { Users, Mail, File } from "lucide-react";
 
 const EXTERNALS = [
   {
@@ -8,7 +8,7 @@ const EXTERNALS = [
     name: "Discord",
     url: "https://discord.gg/socgroup",
     display: "SOC Analyst Discord",
-    icon: Discord,
+    icon: Users, // Use Users icon as Discord alternative
     animate: "animate-pulse"
   },
   {
@@ -24,7 +24,7 @@ const EXTERNALS = [
     name: "Email Ingestion",
     url: "mailto:soc-reports@company.com",
     display: "soc-reports@company.com",
-    icon: Envelope,
+    icon: Mail, // Use Mail icon instead of Envelope
     animate: "animate-pulse"
   }
 ];
